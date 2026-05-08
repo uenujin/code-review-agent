@@ -7,18 +7,21 @@ Chroma 向量数据库客户端。
 from functools import lru_cache
 
 from langchain_chroma import Chroma
-from langchain_community.embeddings import FakeEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from config import CHROMA_PERSIST_DIR, CHROMA_COLLECTION_NAME
 
 
 def _build_embeddings():
     """
-    使用 FakeEmbeddings 做演示，生产中替换为真实嵌入模型
-    （如 OpenAIEmbeddings、HuggingFaceEmbeddings 等）。
-    FakeEmbeddings 生成固定维度随机向量，足以验证检索流程。
+    多语言语义嵌入模型，支持中英文混合检索。
+    paraphrase-multilingual-MiniLM-L12-v2 覆盖 50+ 语言，首次运行自动下载（约 470 MB）。
     """
-    return FakeEmbeddings(size=1536)
+    return HuggingFaceEmbeddings(
+        model_name="paraphrase-multilingual-MiniLM-L12-v2",
+        model_kwargs={"device": "cpu"},
+        encode_kwargs={"normalize_embeddings": True},
+    )
 
 
 @lru_cache(maxsize=1)
